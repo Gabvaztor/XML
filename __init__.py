@@ -17,17 +17,20 @@ to_filter_sheet = "Hoja1"
 with_filters_sheet = "neba"
 
 def read_from_xlsx_by_municipality(path, sheet, column, municipality=None):
-    """Read from a path and a sheet"""
+    """Read from a path, a sheet and a column. Optionally a municipality."""
 
     excel = pd.read_excel(path, str(sheet))
     municipality_column = excel[[column]]
+    pt(excel.head())
     if municipality is not None:
         rows = municipality_column.shape[0]
         municipalities = []
         for i in range(rows):
             if municipality_column.iloc[i][0] == municipality:
                 municipalities.append(municipality_column.iloc[i][0])
-        pt(municipalities)
+        pt(len(municipalities))
+    else:
+        pass
     pt(municipality_column.shape)
 
 read_from_xlsx_by_municipality(path_to_filter, to_filter_sheet, to_filter_column, to_filter_municipality)
