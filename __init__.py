@@ -12,20 +12,27 @@ path_origin = "D:\\Machine_Learning\\DataSets\\VF\\CARMONA_1_SEMANA_OCTUBRE_(200
 path_technology = "D:\\Machine_Learning\\DataSets\\VF\\neba.xlsx"
 paths = [path_origin, path_technology]
 
-origin_column = "POBLACION"
-technology_column = "MUNICIPIO"
+#Columns
+origin_column_municipality = "POBLACION"
+technology_column_municipality = "MUNICIPIO"
+origin_column_address = "DIRECCION"
+technology_column_address = "DIRECCION"
+
+
 origin_municipality = "CARMONA"
 technology_municipality = "CARMONA"
 origin_sheet = "Hoja1"
 technology_sheet = "neba"
 
 def algorithm(paths):
+    origin = pd.read_excel(paths[0], origin_sheet)
+    technology = pd.read_excel(paths[1], technology_sheet)
     #1: optional
-    municipalities_list = municipalies_filter(paths[0], paths[1])
+    municipalities_list = municipalies_filter(origin, technology)
     #2
-    dict_origin_mun_pos, dict_technology_mun_pos = create_dicts_municipaly_position(municipalities_list)
+    dict_origin_mun_pos, dict_technology_mun_pos = create_dicts_municipaly_position(origin, technology, municipalities_list)
 
-def create_dicts_municipaly_position(municipalities_list=None):
+def create_dicts_municipaly_position(origin, technology, municipalities_list=None):
     """
     2º. Método que retorne un diccionario que tenga la siguiente forma: {key="Municipio" : value [x,y]}. "x" e "y" son
     las posiciones donde empiezan (x) y acaban (y) los registros del "Municipio" en cuestión. Esto debe hacerse por 
@@ -33,10 +40,31 @@ def create_dicts_municipaly_position(municipalities_list=None):
     :param municipalities_list: list optional
     :return: Retorna dos diccionarios, uno por cada archivo, con la forma comentada.
     """
+    dict_origin = {}
+    dict_technology = {}
+    municipality_column_origin = origin[[origin_column_municipality]]
+    municipality_column_technology = technology[[technology_column_municipality]]
+    address_column_origin = origin[[origin_column_municipality]]
+    address_column_technology = technology[[technology_column_municipality]]
+
+    index = 0
+    municipalities_list_origin = list(np.squeeze(np.asarray(municipality_column_origin.iloc[:])))
+    municipalities_list_technology = list(np.squeeze(np.asarray(municipality_column_technology.iloc[:])))
+    address_list_origin = list(np.squeeze(np.asarray(address_column_origin.iloc[:])))
+    address_list_technology = list(np.squeeze(np.asarray(address_column_technology.iloc[:])))
+
     if municipalities_list is not None:
-        pass
+
+        # File origin
+        pt(municipalities_list_origin[0])
+        for i in range(len(address_list_origin)):
+            if municipalities_list_origin[i] in municipalities_list:
+                dict_origin.update({municipalities_list_origin[0]:i})
+        pt(dict_origin)
     else: # If not municipalities_list
         pass
+
+    return dict_origin, dict_technology
 
 def municipalies_filter(origin, technology):
     """
@@ -46,10 +74,14 @@ def municipalies_filter(origin, technology):
     :param technology: excel tecnología
     :return: municipalities_list = lista de municipios filtrados
     """
-    origin_ = pd.read_excel(origin, origin_sheet)
-    municipality_column_origin = origin_[[origin_column]]
+    pt("STEP 1/5...")
+    municipality_column_origin = origin[[origin_column_municipality]]
     # This line-code get the no-repeated values in municipality_column_origin
-    municipalities_list = list(set(np.squeeze(np.asarray(municipality_column_origin.iloc[:]))))
+    municipalities_list_origin = set(np.squeeze(np.asarray(municipality_column_origin.iloc[:])))
+    municipality_column_technology = technology[[technology_column_municipality]]
+    municipalities_list_technology = set(np.squeeze(np.asarray(municipality_column_technology.iloc[:])))
+    municipalities_list = municipalities_list_origin.intersection(municipalities_list_technology)
+    pt("STEP 1/5 Complete")
     return municipalities_list
 
 def read_from_xlsx_by_municipality(path, sheet, column, municipality=None):
