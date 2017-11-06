@@ -5,7 +5,8 @@ import pandas as pd
 import xlrd
 from UtilsFunctions import pt
 import numpy as np
-
+# To delete nan values
+import math
 
 # Paths
 path_origin = "D:\\Machine_Learning\\DataSets\\VF\\CARMONA_1_SEMANA_OCTUBRE_(200_REGISTROS).xlsx"
@@ -16,7 +17,7 @@ paths = [path_origin, path_technology]
 origin_column_municipality = "POBLACION"
 technology_column_municipality = "MUNICIPIO"
 origin_column_address = "DIRECCION"
-technology_column_address = "DIRECCION"
+technology_column_address = "Direccion"
 
 
 origin_municipality = "CARMONA"
@@ -44,28 +45,46 @@ def create_dicts_municipaly_position(origin, technology, municipalities_list=Non
     dict_technology = {}
     municipality_column_origin = origin[[origin_column_municipality]]
     municipality_column_technology = technology[[technology_column_municipality]]
-    address_column_origin = origin[[origin_column_municipality]]
-    address_column_technology = technology[[technology_column_municipality]]
+    address_column_origin = origin[[origin_column_address]]
+    address_column_technology = technology[[technology_column_address]]
 
-    index = 0
     municipalities_list_origin = list(np.squeeze(np.asarray(municipality_column_origin.iloc[:])))
     municipalities_list_technology = list(np.squeeze(np.asarray(municipality_column_technology.iloc[:])))
     address_list_origin = list(np.squeeze(np.asarray(address_column_origin.iloc[:])))
     address_list_technology = list(np.squeeze(np.asarray(address_column_technology.iloc[:])))
 
     if municipalities_list is not None:
-
-        # File origin
-        pt(municipalities_list_origin[0])
-        for i in range(len(address_list_origin)):
-            if municipalities_list_origin[i] in municipalities_list:
-                dict_origin.update({municipalities_list_origin[0]:i})
-        pt(dict_origin)
+        dict_origin = phase_2(municipalities_list_origin, address_list_origin, municipalities_list)
+        dict_technology = phase_2(municipalities_list_technology, address_list_technology, municipalities_list)
     else: # If not municipalities_list
         pass
 
     return dict_origin, dict_technology
 
+def phase_2(municipalities_list_file, address_list_origin, municipalities_list=None):
+    dict = {}
+    must_upload_municipality = True
+    actual_municipality = ""
+    last_municipality = ""
+    range_ = len(address_list_origin)
+    # File origin
+    for i in range(range_):
+        if i == 0 or municipalities_list_file[i] != actual_municipality and municipalities_list_file[i] \
+                and type(municipalities_list_file[i]) != np.float:
+            actual_municipality = municipalities_list_file[i]
+            must_upload_municipality = True
+            if municipalities_list_file[
+                        i - 1] != actual_municipality and i != 0 and last_municipality in municipalities_list:
+                dict[last_municipality] = [dict.get(last_municipality), i - 1]
+        if municipalities_list_file[i] in municipalities_list:
+            if i == range_ - 1 and actual_municipality in municipalities_list:
+                dict[municipalities_list_file[i]] = [dict[actual_municipality], i]
+            if must_upload_municipality:
+                dict.update({municipalities_list_file[i]: i})
+                must_upload_municipality = False
+                last_municipality = actual_municipality
+    pt(dict)
+    return dict
 def municipalies_filter(origin, technology):
     """
     1º. Opcional: Filtro de municipios en orden de ambos archivos. Esto es, retornar una lista con los municipios que
