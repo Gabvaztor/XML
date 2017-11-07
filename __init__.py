@@ -22,6 +22,8 @@ technology_column_address = "Direccion"
 origin_sheet = "Hoja1"
 technology_sheet = "neba"
 
+
+
 def algorithm(paths):
     origin = pd.read_excel(paths[0], origin_sheet)
     technology = pd.read_excel(paths[1], technology_sheet)
@@ -32,6 +34,56 @@ def algorithm(paths):
                                                                                     technology,
                                                                                     municipalities_list)
     #3: phase 3
+    list_with_mun_pos_ads_origin, list_with_mun_pos_ads_technology = find_address_by_mun_pos(origin,
+                                                                                             technology,
+                                                                                             dict_origin_mun_pos,
+                                                                                             dict_technology_mun_pos)
+    #4: phase 4
+    #ROD
+
+
+
+
+def phase_3(address_list_file, dict_file_mun_pos):
+    dict = {}
+    lists_pos_ads = []
+
+    for key, value in dict_file_mun_pos.items():
+        if value[0] == value [1]:
+            list_pos_ads = [value[0], address_list_file[value[0]]]
+            lists_pos_ads.append(list_pos_ads)
+        else:
+            for i in range(value[0],value[1]):
+                list_pos_ads = [i,address_list_file[i]]
+                lists_pos_ads.append(list_pos_ads)
+            dict[key] = lists_pos_ads
+    pt(dict)
+    return dict
+
+
+def find_address_by_mun_pos(origin, technology, dict_origin_mun_pos, dict_technology_mun_pos):
+    """
+    Por cada municipio, crear una lista con la forma [pos, address] por cada posición. Será una lista de listas. 
+    Al final retornará un diccionario con la forma: {key=municipio : value= [[pos,address],[pos,address],...] por cada
+    uno de los ficheros.
+    :param origin: 
+    :param technology: 
+    :param dict_origin_mun_pos: 
+    :param dict_technology_mun_pos: 
+    :return: Retornará un diccionario con la forma: {key=municipio : value= [[pos,address],[pos,address],...] por cada
+    uno de los ficheros.
+    """
+    pt("STEP 3/5...")
+    address_column_origin = origin[[origin_column_address]]
+    address_column_technology = technology[[technology_column_address]]
+    address_list_origin = list(np.squeeze(np.asarray(address_column_origin.iloc[:])))
+    address_list_technology = list(np.squeeze(np.asarray(address_column_technology.iloc[:])))
+
+    dict_origin = phase_3(address_list_origin, dict_origin_mun_pos)
+    dict_technology = phase_3(address_list_technology, dict_technology_mun_pos)
+    pt("STEP 3/5 Complete")
+    return dict_origin, dict_technology
+
 def create_dicts_municipaly_position(origin, technology, municipalities_list=None):
     """
     2º. Método que retorne dos diccionarios que tengan la siguiente forma: {key="Municipio" : value [x,y]}. "x" e "y" son
@@ -45,28 +97,23 @@ def create_dicts_municipaly_position(origin, technology, municipalities_list=Non
     dict_technology = {}
     municipality_column_origin = origin[[origin_column_municipality]]
     municipality_column_technology = technology[[technology_column_municipality]]
-    address_column_origin = origin[[origin_column_address]]
-    address_column_technology = technology[[technology_column_address]]
-
     municipalities_list_origin = list(np.squeeze(np.asarray(municipality_column_origin.iloc[:])))
     municipalities_list_technology = list(np.squeeze(np.asarray(municipality_column_technology.iloc[:])))
-    address_list_origin = list(np.squeeze(np.asarray(address_column_origin.iloc[:])))
-    address_list_technology = list(np.squeeze(np.asarray(address_column_technology.iloc[:])))
 
     if municipalities_list is not None:
-        dict_origin = phase_2(municipalities_list_origin, address_list_origin, municipalities_list)
-        dict_technology = phase_2(municipalities_list_technology, address_list_technology, municipalities_list)
+        dict_origin = phase_2(municipalities_list_origin, municipalities_list)
+        dict_technology = phase_2(municipalities_list_technology, municipalities_list)
     else: # If not municipalities_list
         pass
     pt("STEP 2/5 Complete")
     return dict_origin, dict_technology
 
-def phase_2(municipalities_list_file, address_list_origin, municipalities_list=None):
+def phase_2(municipalities_list_file, municipalities_list=None):
     dict = {}
     must_upload_municipality = True
     actual_municipality = ""
     last_municipality = ""
-    range_ = len(address_list_origin)
+    range_ = len(municipalities_list_file)
     # File origin
     for i in range(range_):
         if i == 0 or municipalities_list_file[i] != actual_municipality and municipalities_list_file[i] \

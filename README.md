@@ -11,7 +11,7 @@ Los excels deberán estar ordenados por Municipios para tener en cuenta las posi
 
 2º. Método que retorne dos diccionarios que tengan la siguiente forma: {key="Municipio" : value [x,y]}. "x" e "y" son las posiciones donde empiezan (x) y acaban (y) los registros del "Municipio" en cuestión. Esto debe hacerse por cada archivo. Es decir, debe retornar dos diccionarios, uno por cada archivo.
 
-3º. Por cada municipio de cada uno de los diccionarios del paso 2, crear un diccionario con la forma: {key=posición : value="dirección"}. Se retornan dos diccionarios.
+3º. Por cada municipio, crear una lista con la forma [pos, address] por cada posición. Será una lista de listas. Al final retornará un diccionario con la forma: {key=municipio : value= [[pos,address],[pos,address],...] por cada uno de los ficheros.
 
 4º. A partir de esos dos diccionarios, comparar mediante el ALGORITMO las direcciones. El ALGORITMO deberá comparar las direcciones y decidir qué direcciones son las mismas. Se deberá crear un diccionario de la siguiente forma: {key=posición : value="Gescal17"} ("Gescal17" es una columna del excel de la tecnología). La key contiene la posición del excel "origen" que el ALGORITMO ha comprobado que existe en el excel "tecnología". Se retornará ese diccionario.
 
