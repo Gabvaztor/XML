@@ -4,9 +4,8 @@ import pandas as pd
 # Necessary to work. If not installed, try " pip3 install xlrd"
 import xlrd
 from UtilsFunctions import pt
+# To delete nan values and work with scientist library
 import numpy as np
-# To delete nan values
-import math
 
 # Paths
 path_origin = "D:\\Machine_Learning\\DataSets\\VF\\CARMONA_1_SEMANA_OCTUBRE_(200_REGISTROS).xlsx"
@@ -20,8 +19,6 @@ origin_column_address = "DIRECCION"
 technology_column_address = "Direccion"
 
 
-origin_municipality = "CARMONA"
-technology_municipality = "CARMONA"
 origin_sheet = "Hoja1"
 technology_sheet = "neba"
 
@@ -30,17 +27,20 @@ def algorithm(paths):
     technology = pd.read_excel(paths[1], technology_sheet)
     #1: optional
     municipalities_list = municipalies_filter(origin, technology)
-    #2
-    dict_origin_mun_pos, dict_technology_mun_pos = create_dicts_municipaly_position(origin, technology, municipalities_list)
-
+    #2: phase 2
+    dict_origin_mun_pos, dict_technology_mun_pos = create_dicts_municipaly_position(origin,
+                                                                                    technology,
+                                                                                    municipalities_list)
+    #3: phase 3
 def create_dicts_municipaly_position(origin, technology, municipalities_list=None):
     """
-    2º. Método que retorne un diccionario que tenga la siguiente forma: {key="Municipio" : value [x,y]}. "x" e "y" son
+    2º. Método que retorne dos diccionarios que tengan la siguiente forma: {key="Municipio" : value [x,y]}. "x" e "y" son
     las posiciones donde empiezan (x) y acaban (y) los registros del "Municipio" en cuestión. Esto debe hacerse por 
     cada archivo. Es decir, debe retornar dos diccionarios, uno por cada archivo.
     :param municipalities_list: list optional
     :return: Retorna dos diccionarios, uno por cada archivo, con la forma comentada.
     """
+    pt("STEP 2/5...")
     dict_origin = {}
     dict_technology = {}
     municipality_column_origin = origin[[origin_column_municipality]]
@@ -58,7 +58,7 @@ def create_dicts_municipaly_position(origin, technology, municipalities_list=Non
         dict_technology = phase_2(municipalities_list_technology, address_list_technology, municipalities_list)
     else: # If not municipalities_list
         pass
-
+    pt("STEP 2/5 Complete")
     return dict_origin, dict_technology
 
 def phase_2(municipalities_list_file, address_list_origin, municipalities_list=None):
@@ -77,12 +77,14 @@ def phase_2(municipalities_list_file, address_list_origin, municipalities_list=N
                         i - 1] != actual_municipality and i != 0 and last_municipality in municipalities_list:
                 dict[last_municipality] = [dict.get(last_municipality), i - 1]
         if municipalities_list_file[i] in municipalities_list:
-            if i == range_ - 1 and actual_municipality in municipalities_list:
-                dict[municipalities_list_file[i]] = [dict[actual_municipality], i]
-            if must_upload_municipality:
+            if must_upload_municipality: # Must be first because else execute error
                 dict.update({municipalities_list_file[i]: i})
                 must_upload_municipality = False
                 last_municipality = actual_municipality
+            if i == range_ - 1 and actual_municipality in municipalities_list:
+                dict[municipalities_list_file[i]] = [dict[actual_municipality], i]
+
+
     pt(dict)
     return dict
 def municipalies_filter(origin, technology):
@@ -100,6 +102,7 @@ def municipalies_filter(origin, technology):
     municipality_column_technology = technology[[technology_column_municipality]]
     municipalities_list_technology = set(np.squeeze(np.asarray(municipality_column_technology.iloc[:])))
     municipalities_list = municipalities_list_origin.intersection(municipalities_list_technology)
+    pt(municipalities_list)
     pt("STEP 1/5 Complete")
     return municipalities_list
 
