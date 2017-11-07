@@ -23,7 +23,6 @@ origin_sheet = "Hoja1"
 technology_sheet = "neba"
 
 
-
 def algorithm(paths):
     origin = pd.read_excel(paths[0], origin_sheet)
     technology = pd.read_excel(paths[1], technology_sheet)
@@ -34,15 +33,37 @@ def algorithm(paths):
                                                                                     technology,
                                                                                     municipalities_list)
     #3: phase 3
-    list_with_mun_pos_ads_origin, list_with_mun_pos_ads_technology = find_address_by_mun_pos(origin,
+    dict_with_lists_with_mun_pos_ads_origin, dict_with_lists_with_mun_pos_ads_technology = find_address_by_mun_pos(
+                                                                                             origin,
                                                                                              technology,
                                                                                              dict_origin_mun_pos,
                                                                                              dict_technology_mun_pos)
     #4: phase 4
     #ROD
+    dict_pos_gescal = addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
+                                           dict_with_lists_with_mun_pos_ads_technology,
+                                           technology)
 
 
 
+def addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
+                         dict_with_lists_with_mun_pos_ads_technology,
+                         technology):
+    """
+    4º. A partir de esos dos diccionarios, comparar mediante el ALGORITMO las direcciones. El ALGORITMO deberá comparar
+     las direcciones y decidir qué direcciones son las mismas. Se deberá crear un diccionario de la siguiente forma: 
+     {key=posición : value="Gescal17"} ("Gescal17" es una columna del excel de la tecnología). La key contiene la 
+     posición del excel "origen" que el ALGORITMO ha comprobado que existe en el excel "tecnología". Se retornará
+     ese diccionario.
+
+    :param dict_with_lists_with_mun_pos_ads_origin: 
+    :param dict_with_lists_with_mun_pos_ads_technology: 
+    :param technology: 
+    :return: Un diccionario de la siguiente forma: {key=posición de archivo origen : value="Gescal17"} 
+    """
+    dict = {}
+    # TODO Create Phase 4
+    return dict
 
 def phase_3(address_list_file, dict_file_mun_pos):
     dict = {}
