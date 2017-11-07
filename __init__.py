@@ -62,7 +62,7 @@ def addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
     :return: Un diccionario de la siguiente forma: {key=posición de archivo origen : value="Gescal17"} 
     """
     dict = {}
-    # TODO Create Phase 4
+    # TODO Create Phase 4, change GESCAL17
     return dict
 
 def phase_3(address_list_file, dict_file_mun_pos):
@@ -173,22 +173,5 @@ def municipalies_filter(origin, technology):
     pt(municipalities_list)
     pt("STEP 1/5 Complete")
     return municipalities_list
-
-def read_from_xlsx_by_municipality(path, sheet, column, municipality=None):
-    """Read from a path, a sheet and a column. Optionally a municipality."""
-
-    excel = pd.read_excel(path, str(sheet))
-    municipality_column = excel[[column]]
-    pt(excel.head())
-    if municipality is not None:
-        rows = municipality_column.shape[0]
-        municipalities = []
-        for i in range(rows):
-            if municipality_column.iloc[i][0] == municipality:
-                municipalities.append(municipality_column.iloc[i][0])
-        pt(len(municipalities))
-    else:
-        pass
-    pt(municipality_column.shape)
 
 algorithm(paths)
