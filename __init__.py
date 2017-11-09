@@ -57,8 +57,14 @@ def update_origin_from_positions_list(positions_list):
     fichero origen que contiene una dirección (que el ALGORITMO ha comprobado que existe) que está en el archivo 
     "tecnología"
     """
-    #TODO Update excel from positions_list
-    pass
+    pt("STEP 5/5...")
+    # TODO Update excel from positions_list
+    try:
+        pt("STEP 5/5 COMPLETED")
+        pt("FILE UPDATE CORRECTLY")
+    except Exception:
+        pt("STEP 5/5 FAILED")
+        pt("FILE DOESN'T UPDATE CORRECTLY")
 
 def addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
                          dict_with_lists_with_mun_pos_ads_technology):
@@ -72,8 +78,10 @@ def addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
     :param dict_with_lists_with_mun_pos_ads_technology: 
     :return: La lista de posiciones [pos1,pos2,pos3,...]
     """
+    pt("STEP 4/5...")
     positions_list = []
     # TODO Create Phase 4
+    pt("STEP 4/5 Complete")
     return positions_list
 
 def phase_3(address_list_file, dict_file_mun_pos):
