@@ -23,6 +23,9 @@ origin_sheet = "Hoja1"
 technology_sheet = "neba"
 
 
+
+
+
 def algorithm(paths):
     origin = pd.read_excel(paths[0], origin_sheet)
     technology = pd.read_excel(paths[1], technology_sheet)
@@ -40,30 +43,38 @@ def algorithm(paths):
                                                                                              dict_technology_mun_pos)
     #4: phase 4
     #ROD
-    dict_pos_gescal = addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
-                                           dict_with_lists_with_mun_pos_ads_technology,
-                                           technology)
+    positions_list = addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
+                                           dict_with_lists_with_mun_pos_ads_technology)
 
+    #5: phase 5
+    update_origin_from_positions_list(positions_list)
 
+def update_origin_from_positions_list(positions_list):
+    """
+    A partir de esa lista, se deberá actualizar en el excel "origen" las posiciones de la lista creando una nueva
+     columna. Contendrá la tecnología filtrada del excel "tecnología".
+    :param positions_list: lista que contenga las posiciones [pos1,pos2,pos3,...] siendo cada posición la posición del 
+    fichero origen que contiene una dirección (que el ALGORITMO ha comprobado que existe) que está en el archivo 
+    "tecnología"
+    """
+    #TODO Update excel from positions_list
+    pass
 
 def addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
-                         dict_with_lists_with_mun_pos_ads_technology,
-                         technology):
+                         dict_with_lists_with_mun_pos_ads_technology):
     """
-    4º. A partir de esos dos diccionarios, comparar mediante el ALGORITMO las direcciones. El ALGORITMO deberá comparar
-     las direcciones y decidir qué direcciones son las mismas. Se deberá crear un diccionario de la siguiente forma: 
-     {key=posición : value="Gescal17"} ("Gescal17" es una columna del excel de la tecnología). La key contiene la 
-     posición del excel "origen" que el ALGORITMO ha comprobado que existe en el excel "tecnología". Se retornará
-     ese diccionario.
+    4º.  A partir de esos dos diccionarios, comparar mediante el ALGORITMO las direcciones. El ALGORITMO deberá comparar
+     las direcciones y decidir qué direcciones son las mismas. Se deberá crear una lista que contenga las posiciones
+     [pos1,pos2,pos3,...] siendo cada posición la posición del fichero origen que contiene una dirección 
+     (que el ALGORITMO ha comprobado que existe) que está en el archivo "tecnología". Se retornará esa lista.
 
     :param dict_with_lists_with_mun_pos_ads_origin: 
     :param dict_with_lists_with_mun_pos_ads_technology: 
-    :param technology: 
-    :return: Un diccionario de la siguiente forma: {key=posición de archivo origen : value="Gescal17"} 
+    :return: La lista de posiciones [pos1,pos2,pos3,...]
     """
-    dict = {}
-    # TODO Create Phase 4, change GESCAL17
-    return dict
+    positions_list = []
+    # TODO Create Phase 4
+    return positions_list
 
 def phase_3(address_list_file, dict_file_mun_pos):
     dict = {}
