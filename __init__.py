@@ -6,6 +6,13 @@ import xlrd
 from UtilsFunctions import pt
 # To delete nan values and work with scientist library
 import numpy as np
+# To write to an existing file. If not installed, try " pip3 install openpyxl"
+import openpyxl
+# OS
+import os
+# TO errors
+import traceback
+
 
 # Paths
 path_origin = "D:\\Machine_Learning\\DataSets\\VF\\CARMONA_1_SEMANA_OCTUBRE_(200_REGISTROS).xlsx"
@@ -23,33 +30,37 @@ origin_sheet = "Hoja1"
 technology_sheet = "neba"
 
 
-
-
-
 def algorithm(paths):
+    """
+    Execute all algorithm's steps.
+    :param paths: 
+    :return: 
+    """
     origin = pd.read_excel(paths[0], origin_sheet)
     technology = pd.read_excel(paths[1], technology_sheet)
     #1: optional
     municipalities_list = municipalies_filter(origin, technology)
     #2: phase 2
-    dict_origin_mun_pos, dict_technology_mun_pos = create_dicts_municipaly_position(origin,
-                                                                                    technology,
-                                                                                    municipalities_list)
+    dict_origin_mun_pos, dict_technology_mun_pos, length_column= create_dicts_municipaly_position(origin,
+                                                                                                 technology,
+                                                                                                 municipalities_list)
     #3: phase 3
     dict_with_lists_with_mun_pos_ads_origin, dict_with_lists_with_mun_pos_ads_technology = find_address_by_mun_pos(
                                                                                              origin,
                                                                                              technology,
                                                                                              dict_origin_mun_pos,
                                                                                              dict_technology_mun_pos)
+    # Close excels
+    del origin
+    del technology
     #4: phase 4
-    #ROD
+    #TODO ROD
     positions_list = addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
                                            dict_with_lists_with_mun_pos_ads_technology)
-
     #5: phase 5
-    update_origin_from_positions_list(positions_list)
+    update_xlsx_from_positions_list(paths[0], origin_sheet, positions_list, length_column)
 
-def update_origin_from_positions_list(positions_list):
+def update_xlsx_from_positions_list(path, sheet, positions_list, length_column):
     """
     A partir de esa lista, se deberá actualizar en el excel "origen" las posiciones de la lista creando una nueva
      columna. Contendrá la tecnología filtrada del excel "tecnología".
@@ -58,13 +69,41 @@ def update_origin_from_positions_list(positions_list):
     "tecnología"
     """
     pt("STEP 5/5...")
-    # TODO Update excel from positions_list
+    positions_list_to_update = ["TECNOLOGIA"]
+    for i in range(length_column):
+        if i in positions_list:
+            positions_list_to_update.append("SI")
+        else:
+            positions_list_to_update.append("NO")
     try:
+        excel = openpyxl.load_workbook(path)
+        add_column(excel, origin_sheet, positions_list_to_update)
+        new_path = save_excel(excel, path)
         pt("STEP 5/5 COMPLETED")
-        pt("FILE UPDATE CORRECTLY")
+        pt("FILE " + str(new_path) + " CREATED CORRECTLY")
     except Exception:
+        pt(traceback.print_exc())
         pt("STEP 5/5 FAILED")
         pt("FILE DOESN'T UPDATE CORRECTLY")
+
+def save_excel(excel, path):
+    first_part = path[:-5]
+    second_part = path[-5:]
+
+    count = 1
+    new_path = first_part + "_" + str(count) + second_part
+    while os.path.exists(new_path):
+        count += 1
+        new_path = first_part + "_" + str(count) + second_part
+    excel.save(new_path)
+    return new_path
+
+def add_column(excel, sheet_name, column):
+    ws = excel[sheet_name]
+    new_column = ws.max_column + 1
+
+    for rowy, value in enumerate(column, start=1):
+        ws.cell(row=rowy, column=new_column, value=value)
 
 def addresses_comparator(dict_with_lists_with_mun_pos_ads_origin,
                          dict_with_lists_with_mun_pos_ads_technology):
@@ -130,7 +169,8 @@ def create_dicts_municipaly_position(origin, technology, municipalities_list=Non
     las posiciones donde empiezan (x) y acaban (y) los registros del "Municipio" en cuestión. Esto debe hacerse por 
     cada archivo. Es decir, debe retornar dos diccionarios, uno por cada archivo.
     :param municipalities_list: list optional
-    :return: Retorna dos diccionarios, uno por cada archivo, con la forma comentada.
+    :return: Retorna dos diccionarios, uno por cada archivo, con la forma comentada. Además, retorna la longitud 
+    de la columna de municipios.
     """
     pt("STEP 2/5...")
     dict_origin = {}
@@ -146,7 +186,7 @@ def create_dicts_municipaly_position(origin, technology, municipalities_list=Non
     else: # If not municipalities_list
         pass
     pt("STEP 2/5 Complete")
-    return dict_origin, dict_technology
+    return dict_origin, dict_technology, len(municipalities_list_origin)
 
 def phase_2(municipalities_list_file, municipalities_list=None):
     dict = {}

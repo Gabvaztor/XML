@@ -9,7 +9,7 @@ Dos excels, uno que sea "origen" y otro que sea "tecnología". Al final, se debe
 Los excels deberán estar ordenados por Municipios para tener en cuenta las posiciones correctamente.
 1º. Opcional: Filtro de municipios en orden de ambos archivos. Esto es, retornar una lista con los municipios que existen realmente en ambos archivos (es opcional porque no se sabe a priori si van a tener los mismos municipios).
 
-2º. Método que retorne dos diccionarios que tengan la siguiente forma: {key="Municipio" : value [x,y]}. "x" e "y" son las posiciones donde empiezan (x) y acaban (y) los registros del "Municipio" en cuestión. Esto debe hacerse por cada archivo. Es decir, debe retornar dos diccionarios, uno por cada archivo.
+2º. Método que retorne dos diccionarios que tengan la siguiente forma: {key="Municipio" : value [x,y]}. "x" e "y" son las posiciones donde empiezan (x) y acaban (y) los registros del "Municipio" en cuestión. Esto debe hacerse por cada archivo. Es decir, debe retornar dos diccionarios, uno por cada archivo además de la longitud de la columna municipio.
 
 3º. Por cada municipio, crear una lista con la forma [pos, address] por cada posición. Será una lista de listas. Al final retornará un diccionario con la forma: {key=municipio : value= [[pos,address],[pos,address],...] por cada uno de los ficheros.
 
